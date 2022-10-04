@@ -27,3 +27,8 @@ tasks.withType<KotlinCompile> {
 application {
     mainClass.set("tms.MainKt")
 }
+
+// See: https://stackoverflow.com/a/63767408/12479250
+tasks.jar {
+    manifest.attributes["Main-Class"] = application.mainClass
+}
