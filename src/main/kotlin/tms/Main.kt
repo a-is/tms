@@ -18,6 +18,13 @@
 
 package tms
 
-fun main(args: Array<String>) {
+import tms.reader.TextReader
 
+fun main(args: Array<String>) {
+    for (arg in args) {
+        val readerResult = TextReader().read(arg)
+        if (readerResult.isFailure) {
+            println(readerResult.exceptionOrNull()?.message)
+        }
+    }
 }
