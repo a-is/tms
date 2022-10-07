@@ -4,5 +4,5 @@ Turing machine simulator.
 
 ## License
 
-This project is licensed under Apache License 2.0 license.
+This project is licensed under GNU GPLv3.
 See [license.txt](license.txt) for details.
