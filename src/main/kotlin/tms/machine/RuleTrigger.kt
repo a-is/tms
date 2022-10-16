@@ -18,18 +18,7 @@
 
 package tms.machine
 
-data class Rule(
-    val trigger: RuleTrigger,
-    val action: RuleAction,
-) {
-    constructor(
-        currentState: String,
-        currentSymbol: Char,
-        newState: String,
-        newSymbol: Char,
-        direction: Direction,
-    ) : this(
-        RuleTrigger(currentState, currentSymbol),
-        RuleAction(newState, newSymbol, direction),
-    )
-}
+data class RuleTrigger(
+    val state: String,
+    val symbol: Char,
+)

@@ -18,18 +18,14 @@
 
 package tms.machine
 
-data class Rule(
-    val trigger: RuleTrigger,
-    val action: RuleAction,
-) {
-    constructor(
-        currentState: String,
-        currentSymbol: Char,
-        newState: String,
-        newSymbol: Char,
-        direction: Direction,
-    ) : this(
-        RuleTrigger(currentState, currentSymbol),
-        RuleAction(newState, newSymbol, direction),
-    )
+enum class Direction(val offset: Int) {
+    LEFT(-1),
+    STAY(0),
+    RIGHT(1)
 }
+
+data class RuleAction(
+    val state: String,
+    val symbol: Char,
+    val direction: Direction,
+)
