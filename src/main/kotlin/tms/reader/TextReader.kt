@@ -61,7 +61,9 @@ private val DIRECTION_PARSER_INFO = FieldParserInfo(
     { name -> "$name should be in ${DIRECTION_MAP.keys}" }
 )
 
-class TextReader : Reader {
+private class LineParser(line: String) {
+    private val lineContent = line.removeComment().split(' ').filter { it.isNotEmpty() }
+
     private fun String.removeComment(delimiter: Char = ';'): String {
         return this.split(delimiter, limit = 2)[0]
     }
@@ -69,9 +71,8 @@ class TextReader : Reader {
     private fun <T> parseField(
         field: Fields,
         fieldParser: FieldParserInfo<T>,
-        content: List<String>,
     ): T {
-        val representation = content.getOrNull(field.ordinal)
+        val representation = lineContent.getOrNull(field.ordinal)
             ?: throw ReaderException("missing ${field.name} at position ${field.ordinal + 1}")
 
         if (!fieldParser.validate(representation)) {
@@ -82,22 +83,39 @@ class TextReader : Reader {
         return fieldParser.getValue(representation)
     }
 
-    private fun parseLine(line: String): Rule? {
-        val lineContent = line.removeComment().split(' ').filter { it.isNotEmpty() }
+    private val _fieldsLazyParsers = mutableMapOf<Fields, Lazy<Any?>>()
 
+    private fun <T> lazyParseField(
+        field: Fields,
+        fieldParser: FieldParserInfo<T>,
+    ): Lazy<T> {
+        val lazyInitializer = lazy { parseField(field, fieldParser) }
+        _fieldsLazyParsers[field] = lazyInitializer
+        return lazyInitializer
+    }
+
+    private fun parseFieldsInCorrectOrder() {
+        for (field in Fields.values()) {
+            _fieldsLazyParsers[field]?.value
+        }
+    }
+
+    fun parse(): Rule? {
         if (lineContent.isEmpty()) {
             /* Blank or comment line */
             return null
         }
 
-        val currentState = parseField(Fields.CURRENT_STATE, STATE_PARSER_INFO, lineContent)
-        val currentSymbol = parseField(Fields.CURRENT_SYMBOL, SYMBOL_PARSER_INFO, lineContent)
-        val newSymbol = parseField(Fields.NEW_SYMBOL, SYMBOL_PARSER_INFO, lineContent)
-        val direction = parseField(Fields.DIRECTION, DIRECTION_PARSER_INFO, lineContent)
-        val newState = parseField(Fields.NEW_STATE, STATE_PARSER_INFO, lineContent)
+        val currentState by lazyParseField(Fields.CURRENT_STATE, STATE_PARSER_INFO)
+        val currentSymbol by lazyParseField(Fields.CURRENT_SYMBOL, SYMBOL_PARSER_INFO)
+        val newState by lazyParseField(Fields.NEW_STATE, STATE_PARSER_INFO)
+        val newSymbol by lazyParseField(Fields.NEW_SYMBOL, SYMBOL_PARSER_INFO)
+        val direction by lazyParseField(Fields.DIRECTION, DIRECTION_PARSER_INFO)
+
+        parseFieldsInCorrectOrder()
 
         if (lineContent.size > Fields.values().size) {
-            throw ReaderException("too many entries")
+            throw ReaderException("too many entries, require: ${Fields.values().size}, actual ${lineContent.size}")
         }
 
         return Rule(
@@ -108,7 +126,11 @@ class TextReader : Reader {
             direction = direction
         )
     }
+}
 
+private fun parseLine(line: String): Rule? = LineParser(line).parse()
+
+class TextReader : Reader {
     override fun read(path: String): Result<List<Rule>> {
         val validLineTemplate
             = "Each line should contain one tuple of the form: " + Fields.values().joinToString(" ")
