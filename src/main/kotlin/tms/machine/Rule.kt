@@ -32,4 +32,29 @@ data class Rule(
         RuleTrigger(currentState, currentSymbol),
         RuleAction(newState, newSymbol, direction),
     )
+
+    fun replaceWildcard(wildcard: Char, symbol: Char): Rule {
+        var (currentState, currentSymbol) = trigger
+        var (newState, newSymbol, direction) = action
+
+        if (currentSymbol == wildcard) {
+            currentSymbol = symbol
+        }
+
+        if (newState == wildcard.toString()) {
+            newState = currentState
+        }
+
+        if (newSymbol == wildcard) {
+            newSymbol = currentSymbol
+        }
+
+        return Rule(
+            currentState,
+            currentSymbol,
+            newState,
+            newSymbol,
+            direction,
+        )
+    }
 }

@@ -20,6 +20,7 @@ package tms.machine
 
 private val DEFAULT_WILDCARD: Char = '*'
 private val DEFAULT_STATE: String = "0"
+private val DEFAULT_WHITESPACE: Char = '_'
 private val DEFAULT_BREAK_STATES: Set<String> = setOf()
 private val DEFAULT_END_STATES: Set<String> = setOf("halt", "H")
 
@@ -30,7 +31,11 @@ class Machine {
     /**
      * Tape. Also contains the position of the head.
      */
-    var tape: Tape = Tape()
+    var tape: Tape = Tape(DEFAULT_WHITESPACE)
+        set(value) {
+            value.whitespace = whitespace
+            field = value
+        }
 
     /**
      * The program for the machine. It is a mapping of [RuleTrigger] to [Rule].
@@ -42,6 +47,9 @@ class Machine {
      * The current state of the machine. Use this field to set the initial state.
      */
     var state: String = DEFAULT_STATE
+
+    var step: Int = 0
+        private set
 
     /**
      * A set of states, after reaching which execution of the program will be suspended.
@@ -64,10 +72,19 @@ class Machine {
     var wildcard: Char = DEFAULT_WILDCARD
 
     /**
+     * Whitespace symbol.
+     */
+    var whitespace: Char = DEFAULT_WHITESPACE
+        set(value) {
+            tape.whitespace = value
+            field = value
+        }
+
+    /**
      * Adds a new rule to the machine program ([rules]).
      */
-    fun MutableMap<RuleTrigger, Rule>.add(rule: Rule) {
-        this[rule.trigger] = rule
+    fun addRule(rule: Rule) {
+        rules[rule.trigger] = rule
     }
 
     /**
@@ -81,7 +98,20 @@ class Machine {
     fun isInterrupted(): Boolean = state in breakStates
 
     private fun nextRule(): Rule {
-        TODO()
+        val symbol = tape.read()
+        val trigger = RuleTrigger(state, symbol)
+
+        var rule = rules[trigger]
+
+        if (rule == null) {
+            rule = rules[RuleTrigger(state, wildcard)]
+        }
+
+        if (rule == null) {
+            throw RuleNotFoundException(trigger)
+        }
+
+        return rule
     }
 
     /**
@@ -94,7 +124,13 @@ class Machine {
             return
         }
 
-        TODO()
+        val rule = nextRule()
+
+        tape.write(rule.action.symbol)
+        tape.move(rule.action.direction)
+        state = rule.action.state
+
+        step++
     }
 
     /**
@@ -107,6 +143,6 @@ class Machine {
     fun run() {
         do {
             step()
-        } while (!isInterrupted())
+        } while (!isInterrupted() && !isHalted())
     }
 }
