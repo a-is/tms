@@ -18,13 +18,59 @@
 
 package tms
 
-import tms.reader.TextReader
+import tms.machine.Direction
+import tms.machine.Machine
+import tms.machine.Rule
 
-fun main(args: Array<String>) {
-    for (arg in args) {
-        val readerResult = TextReader().read(arg)
-        if (readerResult.isFailure) {
-            println(readerResult.exceptionOrNull()?.message)
-        }
+fun ruleFromString(s: String): Rule {
+    val (state, symbol, newSymbol, direction, newState) = s.toCharArray()
+
+    val dir = when(direction.lowercaseChar()) {
+        'l' -> Direction.LEFT
+        'r' -> Direction.RIGHT
+        else -> Direction.STAY
     }
+
+    return Rule(state.toString(), symbol, newState.toString(), newSymbol, dir)
+}
+
+/**
+ * 4 state busy beaver.
+ */
+fun busyBeaver4() {
+    val machine = Machine()
+
+    machine.state = "a"
+    machine.whitespace = '0'
+
+    val rules = listOf(
+        "a01rb",
+        "a11lb",
+        "b01la",
+        "b10lc",
+        "c01rH",
+        "c11ld",
+        "d01rd",
+        "d10ra",
+    )
+
+    for (rule in rules) {
+        machine.addRule(ruleFromString(rule))
+    }
+
+    machine.run()
+
+    var ones = 0
+
+    machine.tape.forEachIndexed { _, symbol ->
+        if (symbol == '1')
+            ones++
+    }
+
+    println("Ones: $ones")
+    println("Steps: ${machine.step}")
+}
+
+fun main() {
+    busyBeaver4()
 }
