@@ -16,13 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package tms
+package tms.console
 
-import tms.console.Console
+class UnsupportedCommandException(
+    private val command: String
+) : Exception() {
 
-fun main() {
-    val console = Console()
-
-    console.run()
-
+    override val message: String
+        get() = "Unsupported command: $command"
 }

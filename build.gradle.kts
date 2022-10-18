@@ -14,6 +14,7 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
+    implementation("org.jline:jline:3.21.0")
 }
 
 tasks.test {

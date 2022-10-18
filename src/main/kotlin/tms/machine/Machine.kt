@@ -38,7 +38,7 @@ class Machine(
      * The program for the machine. It is a mapping of [RuleTrigger] to [Rule].
      * To add a new rule, use the [add] function.
      */
-    private val rules: Map<RuleTrigger, Rule> = rules.map { it.trigger to it }.toMap()
+    private val rules: Map<RuleTrigger, Rule> = rules.associateBy { it.trigger }
 
     /**
      * The current state of the machine. Use this field to set the initial state.
