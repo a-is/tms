@@ -19,7 +19,7 @@
 package tms
 
 import tms.machine.Direction
-import tms.machine.Machine
+import tms.machine.MachineBuilder
 import tms.machine.Rule
 
 fun ruleFromString(s: String): Rule {
@@ -38,33 +38,28 @@ fun ruleFromString(s: String): Rule {
  * 4 state busy beaver.
  */
 fun busyBeaver4() {
-    val machine = Machine()
-
-    machine.state = "a"
-    machine.whitespace = '0'
-
     val rules = listOf(
-        "a01rb",
-        "a11lb",
-        "b01la",
-        "b10lc",
-        "c01rH",
-        "c11ld",
-        "d01rd",
-        "d10ra",
+        "a01rb", "a11lb",
+        "b01la", "b10lc",
+        "c01rH", "c11ld",
+        "d01rd", "d10ra",
     )
 
-    for (rule in rules) {
-        machine.addRule(ruleFromString(rule))
-    }
+    val machine = MachineBuilder()
+        .rules(rules.map(::ruleFromString).toList())
+        .initialState("a")
+        .endStates(setOf("H"))
+        .whitespace('0')
+        .build()
 
     machine.run()
 
     var ones = 0
 
     machine.tape.forEachIndexed { _, symbol ->
-        if (symbol == '1')
+        if (symbol == '1') {
             ones++
+        }
     }
 
     println("Ones: $ones")

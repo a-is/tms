@@ -18,36 +18,37 @@
 
 package tms.machine
 
-private val DEFAULT_WILDCARD: Char = '*'
-private val DEFAULT_STATE: String = "0"
-private val DEFAULT_WHITESPACE: Char = '_'
-private val DEFAULT_BREAK_STATES: Set<String> = setOf()
-private val DEFAULT_END_STATES: Set<String> = setOf("halt", "H")
-
 /**
  * The executor of the Turing machine.
  */
-class Machine {
+class Machine(
+    tape: Tape,
+    rules: List<Rule>,
+    initialState: String,
+    endStates: Set<String>,
+    wildcard: Char,
+    whitespace: Char,
+) {
     /**
      * Tape. Also contains the position of the head.
      */
-    var tape: Tape = Tape(DEFAULT_WHITESPACE)
-        set(value) {
-            value.whitespace = whitespace
-            field = value
-        }
+    val tape: Tape = tape
 
     /**
      * The program for the machine. It is a mapping of [RuleTrigger] to [Rule].
      * To add a new rule, use the [add] function.
      */
-    var rules: MutableMap<RuleTrigger, Rule> = mutableMapOf()
+    private val rules: Map<RuleTrigger, Rule> = rules.map { it.trigger to it }.toMap()
 
     /**
      * The current state of the machine. Use this field to set the initial state.
      */
-    var state: String = DEFAULT_STATE
+    var state: String = initialState
+        private set
 
+    /**
+     * Current step number.
+     */
     var step: Int = 0
         private set
 
@@ -57,35 +58,24 @@ class Machine {
      * Note that it only affects the [run] function. The [step] function will execute the step even if the current state
      * is contained in [breakStates].
      */
-    var breakStates: MutableSet<String> = DEFAULT_BREAK_STATES.toMutableSet()
+    private val breakStates: MutableSet<String> = mutableSetOf()
 
     /**
      * A set of states, after reaching which the execution of the program will be halted.
      */
-    var endStates: MutableSet<String> = DEFAULT_END_STATES.toMutableSet()
+    private val endStates: Set<String> = endStates
 
     /**
      * The wildcard character is used for the simplicity of setting rules. If a wildcard character is specified instead
      * of the current character, then any character fits this rule. For the new state and new symbol, the wildcard
      * symbol means "the state/symbol does not change".
      */
-    var wildcard: Char = DEFAULT_WILDCARD
+    private val wildcard: Char = wildcard
 
     /**
      * Whitespace symbol.
      */
-    var whitespace: Char = DEFAULT_WHITESPACE
-        set(value) {
-            tape.whitespace = value
-            field = value
-        }
-
-    /**
-     * Adds a new rule to the machine program ([rules]).
-     */
-    fun addRule(rule: Rule) {
-        rules[rule.trigger] = rule
-    }
+    private val whitespace: Char = whitespace
 
     /**
      * Has the machine reached one of the [endStates].

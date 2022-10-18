@@ -18,8 +18,6 @@
 
 package tms.machine
 
-private val DEFAULT_HEAD_POSITION: Int = 0
-
 /**
  * Auxiliary functions for converting the index of the tape to the indexes of the lists of the left and right parts.
  * And vice versa.
@@ -31,10 +29,6 @@ private fun cell2left(index: Int) = -(index + 1)
 private fun left2cell(index: Int) = -(index + 1)
 private fun cell2right(index: Int) = index
 private fun right2cell(index: Int) = index
-
-private fun <T> MutableList<T>.replace(old: T, new: T) {
-    this.replaceAll { if (it == old) new else it }
-}
 
 private fun removeTrailingWhitespace(list: MutableList<Char>, whitespace: Char) {
     while (list.lastOrNull() == whitespace) {
@@ -53,33 +47,33 @@ private fun expandAndFillWithWhitespace(list: MutableList<Char>, newSize: Int, w
  *
  * Implemented based on two lists.
  */
-class Tape(whitespace: Char) {
+class Tape(
+    whitespace: Char,
+    headPosition: Int,
+    initialState: String = "",
+) {
     /**
      * A list for cells with a negative index (-1, -2, ...). The cell with the index `c` is stored in `_left[-(c + 1)]`,
      * see [cell2left] and [left2cell].
      */
-    private var _left: MutableList<Char> = mutableListOf()
+    private val _left: MutableList<Char> = mutableListOf()
 
     /**
      * A list for cells with a non-negative index (0, 1, ...). The cell with the index `c` is stored in `_right[c]`,
      * see [cell2right] and [right2cell].
      */
-    private var _right: MutableList<Char> = mutableListOf()
+    private val _right: MutableList<Char> = initialState.toMutableList()
 
     /**
      * Head position.
      */
-    var position: Int = DEFAULT_HEAD_POSITION
+    var position: Int = headPosition
+        private set
 
     /**
      * Whitespace symbol.
      */
-    var whitespace: Char = whitespace
-        set(value) {
-            _left.replace(field, value)
-            _right.replace(field, value)
-            field = value
-        }
+    private val whitespace: Char = whitespace
 
     /**
      * Bypassing the content part of the tape. The content part of the tape means the part of the tape enclosed between
