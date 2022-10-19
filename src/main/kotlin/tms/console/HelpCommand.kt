@@ -18,6 +18,8 @@
 
 package tms.console
 
+import org.jline.reader.impl.completer.StringsCompleter
+
 private val OFFSET: String = "    "
 
 class HelpCommand(
@@ -27,8 +29,13 @@ class HelpCommand(
 
     override val description: String = "print help for commands"
 
-    // TODO: optional command name completer
-    override val arguments: List<CommandArgument> = listOf()
+    override val arguments: List<CommandArgument>
+
+    init {
+        val commands = (commands + this).map { it.name }.sorted()
+        val argument = CommandArgument("cmd", "command name", StringsCompleter(commands))
+        arguments = listOf(argument)
+    }
 
     private val helpMessage: String
 
@@ -56,7 +63,20 @@ class HelpCommand(
 
             val commandHelpBuilder = StringBuilder()
 
-            commandHelpBuilder.append(command.name).append('\n')
+            commandHelpBuilder
+                .append(command.name)
+
+            for (argument in command.arguments) {
+                commandHelpBuilder
+                    .append(" <")
+                    .append(argument.name)
+                    .append(">")
+            }
+
+            commandHelpBuilder
+                .append(" - ")
+                .append(command.description)
+                .append('\n')
 
             val maxArgumentLength = command.arguments.maxOfOrNull { it.name.length } ?: 0
 
