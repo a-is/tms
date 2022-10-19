@@ -48,7 +48,7 @@ class HelpCommand(
 
         val maxCommandLength = commands.maxOfOrNull { it.name.length } ?: 0
 
-        for (command in commands.sortedBy { it.name }) {
+        for (command in commands) {
             val commandFormattedName = String.format("%-${maxCommandLength}s", command.name)
 
             helpBuilder
@@ -69,7 +69,7 @@ class HelpCommand(
 
         val commandsHelp = mutableMapOf<String, String>()
 
-        for (command in commands.sortedBy { it.name }) {
+        for (command in commands) {
 
             val helpBuilder = StringBuilder()
 
