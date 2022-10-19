@@ -35,16 +35,21 @@ class Console(
 ) {
     private val executor: Executor
 
+    private val completer: CommandCompleter
+
     init {
         val commands = commands.toMutableList()
         commands += QuitCommand()
         commands += HelpCommand(commands)
 
         executor = Executor(commands)
+        completer = CommandCompleter(commands)
     }
 
     fun run() {
-        val reader = LineReaderBuilder.builder().build()
+        val reader = LineReaderBuilder.builder()
+            .completer(completer)
+            .build()
 
         println(LICENSE_NOTICE)
 
@@ -64,7 +69,6 @@ class Console(
             } catch (e: Exception) {
                 println(e.message)
             }
-
         }
     }
 }
