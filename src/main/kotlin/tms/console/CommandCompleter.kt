@@ -55,7 +55,7 @@ class CommandCompleter(
     }
 
     override fun complete(reader: LineReader, line: ParsedLine, candidates: MutableList<Candidate>) {
-        if (line.cursor() == 0) {
+        if (line.wordIndex() == 0) {
             commandCompleter.complete(reader, line, candidates)
         }
 
