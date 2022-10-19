@@ -39,13 +39,10 @@ class HelpCommand(
 
     private val helpMessage: String
 
-    private val commandsHelpMessage: Map<String, String>
-
     init {
         val commands = (commands + this).sortedBy { it.name }
 
         val helpBuilder = StringBuilder()
-        val commandsHelp = mutableMapOf<String, String>()
 
         helpBuilder.append("Commands:\n")
 
@@ -60,20 +57,33 @@ class HelpCommand(
                 .append(" - ")
                 .append(command.description)
                 .append('\n')
+        }
 
-            val commandHelpBuilder = StringBuilder()
+        helpMessage = helpBuilder.dropLast(1).toString()
+    }
 
-            commandHelpBuilder
+    private val commandsHelpMessage: Map<String, String>
+
+    init {
+        val commands = (commands + this).sortedBy { it.name }
+
+        val commandsHelp = mutableMapOf<String, String>()
+
+        for (command in commands.sortedBy { it.name }) {
+
+            val helpBuilder = StringBuilder()
+
+            helpBuilder
                 .append(command.name)
 
             for (argument in command.arguments) {
-                commandHelpBuilder
+                helpBuilder
                     .append(" <")
                     .append(argument.name)
                     .append(">")
             }
 
-            commandHelpBuilder
+            helpBuilder
                 .append(" - ")
                 .append(command.description)
                 .append('\n')
@@ -83,7 +93,7 @@ class HelpCommand(
             for (argument in command.arguments) {
                 val argumentFormattedName = String.format("%-${maxArgumentLength}s", argument.name)
 
-                commandHelpBuilder
+                helpBuilder
                     .append(OFFSET)
                     .append(argumentFormattedName)
                     .append(" - ")
@@ -91,10 +101,8 @@ class HelpCommand(
                     .append('\n')
             }
 
-            commandsHelp[command.name] = commandHelpBuilder.dropLast(1).toString()
+            commandsHelp[command.name] = helpBuilder.dropLast(1).toString()
         }
-
-        helpMessage = helpBuilder.dropLast(1).toString()
 
         commandsHelpMessage = commandsHelp
     }
