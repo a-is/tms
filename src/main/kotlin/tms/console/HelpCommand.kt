@@ -32,23 +32,23 @@ class HelpCommand(
     override val arguments: List<CommandArgument>
 
     init {
-        val commands = (commands + this).map { it.name }.sorted()
-        val argument = CommandArgument("cmd", "command name", StringsCompleter(commands))
+        val sortedCommands = (commands + this).map { it.name }.sorted()
+        val argument = CommandArgument("cmd", "command name", StringsCompleter(sortedCommands))
         arguments = listOf(argument)
     }
 
     private val helpMessage: String
 
     init {
-        val commands = (commands + this).sortedBy { it.name }
+        val sortedCommands = (commands + this).sortedBy { it.name }
 
         val helpBuilder = StringBuilder()
 
         helpBuilder.append("Commands:\n")
 
-        val maxCommandLength = commands.maxOfOrNull { it.name.length } ?: 0
+        val maxCommandLength = sortedCommands.maxOfOrNull { it.name.length } ?: 0
 
-        for (command in commands) {
+        for (command in sortedCommands) {
             val commandFormattedName = String.format("%-${maxCommandLength}s", command.name)
 
             helpBuilder
@@ -65,11 +65,11 @@ class HelpCommand(
     private val commandsHelpMessage: Map<String, String>
 
     init {
-        val commands = (commands + this).sortedBy { it.name }
+        val sortedCommands = (commands + this).sortedBy { it.name }
 
         val commandsHelp = mutableMapOf<String, String>()
 
-        for (command in commands) {
+        for (command in sortedCommands) {
 
             val helpBuilder = StringBuilder()
 
