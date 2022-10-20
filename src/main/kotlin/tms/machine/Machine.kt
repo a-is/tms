@@ -58,7 +58,7 @@ class Machine(
      * Note that it only affects the [run] function. The [step] function will execute the step even if the current state
      * is contained in [breakStates].
      */
-    private val breakStates: MutableSet<String> = mutableSetOf()
+    val breakStates: MutableSet<String> = mutableSetOf()
 
     /**
      * A set of states, after reaching which the execution of the program will be halted.

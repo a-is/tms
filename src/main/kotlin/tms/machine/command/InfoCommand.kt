@@ -33,7 +33,7 @@ private fun StringBuilder.fillUntil(length: Int, fill: Char = ' ') {
     }
 }
 
-private fun toString(tape: Tape): String {
+fun toString(tape: Tape): String {
     /**
      * ```
      * line1:     0                   10    | < position numbers, multiples of LEGEND_STEP

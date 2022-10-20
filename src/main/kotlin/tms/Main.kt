@@ -23,8 +23,10 @@ import tms.console.Console
 import tms.machine.MachineBuilder
 import tms.machine.command.InfoCommand
 import tms.machine.command.LoadCommand
+import tms.machine.command.toString
+import tms.reader.TextReader
 
-fun main() {
+fun interactive() {
     val dumbMachine = MachineBuilder().build()
     val machine = Wrapper(dumbMachine)
 
@@ -36,4 +38,30 @@ fun main() {
     val console = Console(commands)
 
     console.run()
+}
+
+fun fromFile(path: String) {
+    val reader = TextReader(path)
+
+    reader.read()
+
+    if (!reader.success) {
+        for (error in reader.errors) {
+            println(error)
+        }
+        return
+    }
+
+    val machine = reader.buildMachine()
+    machine.breakStates.clear()
+    machine.run()
+    println(toString(machine.tape))
+}
+
+fun main(args: Array<String>) {
+    when(args.size) {
+        0 -> interactive()
+        1 -> fromFile(args.first())
+        else -> println("Incorrect argument length")
+    }
 }
