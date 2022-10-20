@@ -1,0 +1,18 @@
+; possible 5-state busy beaver
+; 47'176'870 steps, 4'098 ones
+; See: https://en.wikipedia.org/wiki/Busy_beaver
+
+STATE      A
+HALT       H
+WHITESPACE 0
+
+A 0 1 R B
+A 1 1 L C
+B 0 1 R C
+B 1 1 R B
+C 0 1 R D
+C 1 0 L E
+D 0 1 L A
+D 1 1 L D
+E 0 1 R H
+E 1 0 L A

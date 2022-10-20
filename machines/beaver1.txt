@@ -1,0 +1,9 @@
+; 1-state busy beaver
+; 1 step, 1 ones
+; See: https://en.wikipedia.org/wiki/Busy_beaver
+
+STATE      A
+HALT       H
+WHITESPACE 0
+
+A 0 1 R H

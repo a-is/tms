@@ -1,0 +1,13 @@
+; 2-state busy beaver
+; 6 steps, 4 ones
+; See: https://en.wikipedia.org/wiki/Busy_beaver
+
+STATE      A
+HALT       H
+WHITESPACE 0
+
+A 0 1 R B
+A 1 1 L B
+B 0 1 L A
+B 1 1 R H
+
