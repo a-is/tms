@@ -18,14 +18,19 @@
 
 package tms.machine.command
 
+import Wrapper
 import org.jline.builtins.Completers.FilesCompleter
 import tms.console.Command
 import tms.console.CommandArgument
+import tms.machine.Machine
+import tms.reader.TextReader
 import kotlin.io.path.Path
 
 fun currentWorkingDirectory() = Path(System.getProperty("user.dir") ?: "")
 
-class LoadCommand : Command {
+class LoadCommand(
+    private val machine: Wrapper<Machine>
+) : Command {
     override val name: String = "load"
 
     override val description: String = "load machine from file"
@@ -35,7 +40,16 @@ class LoadCommand : Command {
     )
 
     override fun execute(args: List<String>) {
-        TODO("Not yet implemented")
-    }
+        val reader = TextReader(args[1])
 
+        reader.read()
+
+        if (reader.success) {
+            machine.value = reader.buildMachine()
+        } else {
+            for (error in reader.errors) {
+                println(error)
+            }
+        }
+    }
 }
