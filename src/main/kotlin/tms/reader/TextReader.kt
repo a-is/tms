@@ -130,17 +130,21 @@ class TextReader(
     private var line: String = ""
     private var lineNo: Int = -1
 
+    private fun addSyntaxError(startEnd: Int, message: String, note: String? = null)
+            = addSyntaxError(startEnd, startEnd, message, note)
+
+    private fun addSyntaxError(start: Int, end: Int, message: String, note: String? = null) {
+        val error = SyntaxError(path, line, lineNo, start, end, message, note)
+        _errors.add(error)
+    }
+
     private fun checkMissingArgs(
         argNames: String,
         note: String? = null
     ): Boolean {
-        val startEnd = splited.first().end + 1
         if (splited.size == 1) {
-            _errors.add(SyntaxError(
-                path, line, lineNo,
-                startEnd, startEnd,
-                "missing $argNames", note
-            ))
+            val startEnd = splited.first().end + 1
+            addSyntaxError(startEnd, "missing $argNames", note)
             return false
         }
 
@@ -159,11 +163,7 @@ class TextReader(
         }
 
         if (splited.size != 2) {
-            _errors.add(SyntaxError(
-                path, line, lineNo,
-                splited.third().start, splited.last().end,
-                "extra arguments", note
-            ))
+            addSyntaxError(splited.third().start, splited.last().end, "extra arguments", note)
             return false
         }
 
@@ -186,16 +186,12 @@ class TextReader(
             return
         }
 
-        val token = splited.second().token
+        val token = splited.second()
 
         try {
-            initialHeadPosition = token.toInt()
+            initialHeadPosition = token.token.toInt()
         } catch (e: NumberFormatException) {
-            _errors.add(SyntaxError(
-                path, line, lineNo,
-                splited.second().start, splited.second().end,
-                "the position of the head must be an integer"
-            ))
+            addSyntaxError(token.start, token.end, "the position of the head must be an integer")
         }
     }
 
@@ -220,17 +216,13 @@ class TextReader(
             return
         }
 
-        val token = splited.second().token
+        val token = splited.second()
 
-        if (token.length != 1) {
-            _errors.add(SyntaxError(
-                path, line, lineNo,
-                splited.second().start, splited.second().end,
-                "wildcard should be a single character"
-            ))
+        if (token.token.length != 1) {
+            addSyntaxError(token.start, token.end, "wildcard should be a single character")
         }
 
-        wildcard = token.first()
+        wildcard = token.token.first()
     }
 
     private fun processWhitespace() {
@@ -238,17 +230,13 @@ class TextReader(
             return
         }
 
-        val token = splited.second().token
+        val token = splited.second()
 
-        if (token.length != 1) {
-            _errors.add(SyntaxError(
-                path, line, lineNo,
-                splited.second().start, splited.second().end,
-                "whitespace should be a single character"
-            ))
+        if (token.token.length != 1) {
+            addSyntaxError(token.start, token.end, "whitespace should be a single character")
         }
 
-        whitespace = token.first()
+        whitespace = token.token.first()
     }
 
     private fun <T> parseField(fieldName: String, fieldParserInfo: FieldParserInfo<T>, position: Int): T? {
@@ -256,7 +244,7 @@ class TextReader(
             val index = splited.getOrNull(position - 1)?.end ?: 0
             val message = "missing $fieldName at poition $position"
 
-            _errors.add(SyntaxError(path, line, lineNo, index, index, message))
+            addSyntaxError(index, message)
 
             return null
         }
@@ -265,7 +253,7 @@ class TextReader(
 
         if (!fieldParserInfo.validate(representation)) {
             val message = fieldParserInfo.errorMessage(fieldName)
-            _errors.add(SyntaxError(path, line, lineNo, splited[position].start, splited[position].end, message))
+            addSyntaxError(splited[position].start, splited[position].end, message)
             return null
         }
 
@@ -283,7 +271,7 @@ class TextReader(
 
         if (splited.size > index) {
             val message = "too many entries, require: $index, actual ${splited.size}"
-            _errors.add(SyntaxError(path, line, lineNo, splited[index].start, splited.last().end, message))
+            addSyntaxError(splited[index].start, splited.last().end, message)
         }
 
         val rule = Rule(currentState, currentSymbol, newState, newSymbol, direction)
