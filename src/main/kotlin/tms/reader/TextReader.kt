@@ -173,7 +173,7 @@ class TextReader(
     }
 
     private fun processTape() {
-        if (!checkArgumentSingle("tape", "to specify an empty tape, just don't use the TAPE keyword")) {
+        if (!checkMissingArgs("tape", "to specify an empty tape, just don't use the TAPE keyword")) {
             return
         }
 
