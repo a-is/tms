@@ -18,6 +18,7 @@
 
 package tms.reader
 
+import tms.machine.Direction
 import tms.machine.Machine
 import tms.machine.MachineBuilder
 import tms.machine.Rule
@@ -36,6 +37,36 @@ private fun <T> List<T>.second(): T {
 private fun <T> List<T>.third(): T {
     return this[2]
 }
+
+private val DIRECTION_MAP = mapOf(
+    "l" to Direction.LEFT,
+    "*" to Direction.STAY,
+    "r" to Direction.RIGHT
+)
+
+private data class FieldParserInfo<T>(
+    val validate: (String) -> Boolean,
+    val getValue: (String) -> T,
+    val errorMessage: (fieldName: String) -> String,
+)
+
+private val STATE_PARSER_INFO = FieldParserInfo(
+    { true },
+    { it },
+    { error("This function should never be called") }
+)
+
+private val SYMBOL_PARSER_INFO = FieldParserInfo(
+    { it.length == 1 },
+    { it[0] },
+    { name -> "$name should be a single character" }
+)
+
+private val DIRECTION_PARSER_INFO = FieldParserInfo(
+    { it.lowercase() in DIRECTION_MAP.keys },
+    { DIRECTION_MAP[it.lowercase()]!! },
+    { name -> "$name should be in ${DIRECTION_MAP.keys}" }
+)
 
 class TextReader(
     private val path: String
@@ -219,8 +250,51 @@ class TextReader(
         whitespace = token.first()
     }
 
-    private fun processRule(splited: List<Token>, line: String, lineNo: Int) {
-        TODO()
+    private fun <T> parseField(
+        splited: List<Token>,
+        line: String,
+        lineNo: Int,
+        fieldName: String,
+        fieldParserInfo: FieldParserInfo<T>,
+        position: Int
+    ): T? {
+        if (splited.size <= position) {
+            val index = splited.getOrNull(position - 1)?.end ?: 0
+            val message = "missing $fieldName at poition $position"
+
+            _errors.add(Error(path, line, lineNo, index, index, message))
+
+            return null
+        }
+
+        val representation = splited[position].token
+
+        if (!fieldParserInfo.validate(representation)) {
+            val message = fieldParserInfo.errorMessage(fieldName)
+            _errors.add(Error(path, line, lineNo, splited[position].start, splited[position].end, message))
+            return null
+        }
+
+        return fieldParserInfo.getValue(representation)
+    }
+
+    private fun processRule(splited: List<Token>, line: String, lineNo: Int, firstIndex: Int) {
+        var index = firstIndex
+
+        val currentState = parseField(splited, line, lineNo, "CURRENT_STATE", STATE_PARSER_INFO, index++) ?: return
+        val currentSymbol = parseField(splited, line, lineNo, "CURRENT_SYMBOL", SYMBOL_PARSER_INFO, index++) ?: return
+        val newSymbol = parseField(splited, line, lineNo, "NEW_SYMBOL", SYMBOL_PARSER_INFO, index++) ?: return
+        val newState = parseField(splited, line, lineNo, "NEW_STATE", STATE_PARSER_INFO, index++) ?: return
+        val direction = parseField(splited, line, lineNo, "DIRECTION", DIRECTION_PARSER_INFO, index++) ?: return
+
+        if (splited.size > index) {
+            val message = "too many entries, require: $index, actual ${splited.size}"
+            _errors.add(Error(path, line, lineNo, splited[index].start, splited.last().end, message))
+        }
+
+        val rule = Rule(currentState, currentSymbol, newState, newSymbol, direction)
+
+        rules.add(rule)
     }
 
     private fun parseLine(line: String, lineNo: Int) {
@@ -237,8 +311,8 @@ class TextReader(
             "HALT" -> processHalt(splited, line, lineNo)
             "WILDCARD" -> processWildcard(splited, line, lineNo)
             "WHITESPACE" -> processWhitespace(splited, line, lineNo)
-            "RULE" -> processRule(splited.drop(1), line, lineNo)
-            else -> processRule(splited, line, lineNo)
+            "RULE" -> processRule(splited, line, lineNo, 1)
+            else -> processRule(splited, line, lineNo, 0)
         }
     }
 
