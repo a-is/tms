@@ -25,7 +25,7 @@ import org.jline.reader.UserInterruptException
 private val PROMPT = "tms> "
 private val LICENSE_NOTICE = """
     Copyright (C) 2022, Alexey Ismagilov.
-    License GPLv3+: GNU GPL version 3 or later, see <http://gnu.org/licenses/>
+    License GPLv3+: GNU GPL version 3 or later, see <https://gnu.org/licenses/>
     This is free software: you are free to change and redistribute it.
     There is NO WARRANTY, to the extent permitted by law.
     """.trimIndent()
