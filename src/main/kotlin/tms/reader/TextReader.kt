@@ -342,7 +342,7 @@ class TextReader(
         }
 
         if (whitespace != null) {
-            builder.wildcard(whitespace!!)
+            builder.whitespace(whitespace!!)
         }
 
         return builder.build()
