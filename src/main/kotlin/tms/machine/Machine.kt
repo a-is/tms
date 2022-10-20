@@ -101,7 +101,7 @@ class Machine(
             throw RuleNotFoundException(trigger)
         }
 
-        return rule
+        return rule.replaceWildcard(wildcard, symbol)
     }
 
     /**
