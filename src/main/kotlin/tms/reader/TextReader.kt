@@ -37,54 +37,6 @@ private fun <T> List<T>.third(): T {
     return this[2]
 }
 
-class Error(
-    private val filename: String,
-    private val line: String,
-    private val lineNo: Int,
-    private val start: Int,
-    private val end: Int,
-    private val message: String,
-    private val note: String? = null,
-) {
-    /**
-     * gcc like error message
-     *
-     * Example:
-     * ```
-     * machine.txt:12:5: CURRENT_STATE should be a single character
-     *   12 | left 0042 _ * *
-     *      |      ^~~~
-     * ```
-     */
-    override fun toString(): String {
-        val builder = StringBuilder()
-
-        val formattedLineNo = "%4d".format(lineNo)
-
-        builder
-            .append("$filename:$lineNo:$start: $message\n")
-
-        if (note != null) {
-            builder
-                .append("note: $note\n")
-        }
-
-        builder
-            .append("$formattedLineNo | $line\n")
-
-        var tildesCount = (end - start - 1).coerceAtLeast(0)
-
-        builder
-            .append("     | ")
-            .append(" ".repeat(start))
-            .append('^')
-            .append("~".repeat(tildesCount))
-            .append('\n')
-
-        return builder.toString()
-    }
-}
-
 class TextReader(
     private val path: String
 ) {
