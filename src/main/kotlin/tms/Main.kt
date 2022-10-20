@@ -23,7 +23,7 @@ import tms.console.Console
 import tms.machine.MachineBuilder
 import tms.machine.command.InfoCommand
 import tms.machine.command.LoadCommand
-import tms.machine.command.toString
+import tms.machine.prettyPrint
 import tms.reader.TextReader
 
 fun interactive() {
@@ -55,7 +55,7 @@ fun fromFile(path: String) {
     val machine = reader.buildMachine()
     machine.breakStates.clear()
     machine.run()
-    println(toString(machine.tape))
+    prettyPrint(machine)
 }
 
 fun main(args: Array<String>) {
