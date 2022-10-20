@@ -317,8 +317,12 @@ class TextReader(
     }
 
     fun read() {
-        File(path).useLines { lines ->
-            lines.forEachIndexed { index, line -> parseLine(line, index + 1) }
+        try {
+            File(path).useLines { lines ->
+                lines.forEachIndexed { index, line -> parseLine(line, index + 1) }
+            }
+        } catch (e: java.io.FileNotFoundException) {
+            _errors.add(FileNotFoundError("No such file or directory: \"$path\""))
         }
     }
 

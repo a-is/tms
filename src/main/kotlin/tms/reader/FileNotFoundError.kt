@@ -18,4 +18,8 @@
 
 package tms.reader
 
-abstract class Error
+class FileNotFoundError(
+    private val message: String
+) : Error() {
+    override fun toString(): String = message
+}

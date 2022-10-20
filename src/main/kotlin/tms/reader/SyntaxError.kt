@@ -26,7 +26,7 @@ class SyntaxError(
     private val end: Int,
     private val message: String,
     private val note: String? = null,
-) {
+) : Error() {
     /**
      * gcc like error message
      *
