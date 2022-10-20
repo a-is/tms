@@ -19,11 +19,11 @@
 package tms.util
 
 data class Token(
-    val token: String,
+    val value: String,
     val start: Int,
 ) {
     val end
-        get() = start + token.length
+        get() = start + value.length
 }
 
 fun String.tokenize(): List<Token> {

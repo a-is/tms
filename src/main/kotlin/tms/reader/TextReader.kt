@@ -189,7 +189,7 @@ class TextReader(
         val token = splited.second()
 
         try {
-            initialHeadPosition = token.token.toInt()
+            initialHeadPosition = token.value.toInt()
         } catch (e: NumberFormatException) {
             addSyntaxError(token.start, token.end, "the position of the head must be an integer")
         }
@@ -200,7 +200,7 @@ class TextReader(
             return
         }
 
-        initialState = splited.second().token
+        initialState = splited.second().value
     }
 
     private fun processHalt() {
@@ -208,7 +208,7 @@ class TextReader(
             return
         }
 
-        endStates += splited.drop(1).map { it.token }
+        endStates += splited.drop(1).map { it.value }
     }
 
     private fun processWildcard() {
@@ -218,11 +218,11 @@ class TextReader(
 
         val token = splited.second()
 
-        if (token.token.length != 1) {
+        if (token.value.length != 1) {
             addSyntaxError(token.start, token.end, "wildcard should be a single character")
         }
 
-        wildcard = token.token.first()
+        wildcard = token.value.first()
     }
 
     private fun processWhitespace() {
@@ -232,11 +232,11 @@ class TextReader(
 
         val token = splited.second()
 
-        if (token.token.length != 1) {
+        if (token.value.length != 1) {
             addSyntaxError(token.start, token.end, "whitespace should be a single character")
         }
 
-        whitespace = token.token.first()
+        whitespace = token.value.first()
     }
 
     private fun <T> parseField(fieldName: String, fieldParserInfo: FieldParserInfo<T>, position: Int): T? {
@@ -249,7 +249,7 @@ class TextReader(
             return null
         }
 
-        val representation = splited[position].token
+        val representation = splited[position].value
 
         if (!fieldParserInfo.validate(representation)) {
             val message = fieldParserInfo.errorMessage(fieldName)
@@ -286,7 +286,7 @@ class TextReader(
             return
         }
 
-        when(splited[0].token) {
+        when(splited[0].value) {
             "TAPE" -> processTape()
             "HEAD" -> processHead()
             "STATE" -> processState()
