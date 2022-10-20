@@ -26,7 +26,9 @@ import tms.util.Token
 import tms.util.tokenize
 import java.io.File
 
-private fun String.removeComment(delimiter: Char = ';'): String {
+private val COMMENT: Char = ';'
+
+private fun String.removeComment(delimiter: Char): String {
     return this.split(delimiter, limit = 2)[0]
 }
 
@@ -280,7 +282,7 @@ class TextReader(
     }
 
     private fun parseLine() {
-        splited = line.removeComment().tokenize()
+        splited = line.removeComment(COMMENT).tokenize()
 
         if (splited.isEmpty()) {
             return
