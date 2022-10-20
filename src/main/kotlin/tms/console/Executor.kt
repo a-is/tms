@@ -32,9 +32,9 @@ class Executor(
      * Note that it is worth avoiding explicit printing inside the command, since in the future, for example,
      * logging to a file may be added.
      */
-    fun execute(line: String): String {
+    fun execute(line: String) {
         if (line.isBlank()) {
-            return ""
+            return
         }
 
         val splited = line.split(' ').filter { it.isNotEmpty() }
@@ -43,7 +43,7 @@ class Executor(
 
         val command = commands[name] ?: throw UnsupportedCommandException(name)
 
-        return command.execute(splited)
+        command.execute(splited)
     }
 
 }

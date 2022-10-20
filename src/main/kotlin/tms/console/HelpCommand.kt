@@ -107,11 +107,13 @@ class HelpCommand(
         commandsHelpMessage = commandsHelp
     }
 
-    override fun execute(args: List<String>): String {
-        return if (args.size == 1) {
+    override fun execute(args: List<String>) {
+        val message = if (args.size == 1) {
             helpMessage
         } else {
             commandsHelpMessage[args[1]] ?: throw UnsupportedCommandException(args[1])
         }
+
+        println(message)
     }
 }

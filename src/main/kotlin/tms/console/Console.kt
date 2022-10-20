@@ -56,12 +56,7 @@ class Console(
         while (true) {
             try {
                 val command = reader.readLine(PROMPT)
-
-                val result = executor.execute(command)
-
-                if (result.isNotBlank()) {
-                    println(result)
-                }
+                executor.execute(command)
             } catch (e: UserInterruptException) {
                 return
             } catch (e: EndOfFileException) {

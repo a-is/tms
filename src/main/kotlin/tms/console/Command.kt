@@ -37,5 +37,5 @@ interface Command {
     /**
      * Execute the program. The [args] list contains the name of the command (the same as the [name]).
      */
-    fun execute(args: List<String>): String
+    fun execute(args: List<String>)
 }

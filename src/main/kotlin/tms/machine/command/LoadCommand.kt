@@ -34,7 +34,7 @@ class LoadCommand : Command {
         CommandArgument("file", "filename", FilesCompleter(currentWorkingDirectory()))
     )
 
-    override fun execute(args: List<String>): String {
+    override fun execute(args: List<String>) {
         TODO("Not yet implemented")
     }
 
