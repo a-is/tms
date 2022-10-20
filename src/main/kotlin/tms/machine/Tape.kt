@@ -76,8 +76,22 @@ class Tape(
     private val whitespace: Char = whitespace
 
     /**
-     * Bypassing the content part of the tape. The content part of the tape means the part of the tape enclosed between
-     * two non-whitespace symbols and containing all non-whitespace symbols.
+     * The left border of the content part of the tape.
+     * The "content part" of the tape is the smallest subset of the tape containing all non-whitespace characters.
+     */
+    val leftmost: Int
+        get() = left2cell(_left.size - 1)
+
+    /**
+     * The right border of the content part of the tape.
+     * The "content part" of the tape is the smallest subset of the tape containing all non-whitespace characters.
+     */
+    val rightmost: Int
+        get() = right2cell(_right.size - 1)
+
+    /**
+     * Bypassing the content part of the tape.
+     * The "content part" of the tape is the smallest subset of the tape containing all non-whitespace characters.
      */
     fun forEachIndexed(action: (index: Int, symbol: Char) -> Unit) {
         for (i in _left.size - 1 downTo 0) {
