@@ -53,9 +53,9 @@ fun toString(tape: Tape): String {
      * we calculate an additional LEGEND_STEP characters to the left of the screen border
      */
     val leftmost = tape.position - SCREEN_WIDTH / 2 - LEGEND_STEP
-    val rigthmost = tape.position + SCREEN_WIDTH / 2 + 1
+    val rightmost = tape.position + SCREEN_WIDTH / 2 + 1
 
-    for (position in leftmost..rigthmost) {
+    for (position in leftmost..rightmost) {
         if (position % LEGEND_STEP == 0) {
             line1.append(position)
             line2.append('|')
