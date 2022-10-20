@@ -52,8 +52,8 @@ fun toString(tape: Tape): String {
      * To prevent long character numbers from disappearing,
      * we calculate an additional LEGEND_STEP characters to the left of the screen border
      */
-    val leftmost = tape.position - SCREEN_WIDTH / 4 - LEGEND_STEP
-    val rigthmost = tape.position + SCREEN_WIDTH / 4
+    val leftmost = tape.position - SCREEN_WIDTH / 2 - LEGEND_STEP
+    val rigthmost = tape.position + SCREEN_WIDTH / 2 + 1
 
     for (position in leftmost..rigthmost) {
         if (position % LEGEND_STEP == 0) {
@@ -67,9 +67,7 @@ fun toString(tape: Tape): String {
             anchor = line3.length
         }
 
-        line3
-            .append(tape.read(position))
-            .append(' ')
+        line3.append(tape.read(position))
 
         val n = line3.length
 
