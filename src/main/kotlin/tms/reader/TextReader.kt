@@ -122,10 +122,15 @@ class TextReader(
     val success: Boolean
         get() = errors.isEmpty()
 
+    /**
+     * These variables are used in all string processing methods, so as not to drag them into each method,
+     * it was decided to put them in "global" variables.
+     */
+    private var splited: List<Token> = listOf()
+    private var line: String = ""
+    private var lineNo: Int = -1
+
     private fun checkMissingArgs(
-        splited: List<Token>,
-        line: String,
-        lineNo: Int,
         argNames: String,
         note: String? = null
     ): Boolean {
@@ -146,13 +151,10 @@ class TextReader(
      * Checking the number of arguments of a single argument function
      */
     private fun checkArgumentSingle(
-        splited: List<Token>,
-        line: String,
-        lineNo: Int,
         argName: String,
         note: String? = null
     ): Boolean {
-        if (!checkMissingArgs(splited, line, lineNo, argName, note)) {
+        if (!checkMissingArgs(argName, note)) {
             return false
         }
 
@@ -168,9 +170,8 @@ class TextReader(
         return true
     }
 
-    private fun processTape(splited: List<Token>, line: String, lineNo: Int) {
-        if (!checkArgumentSingle(splited, line, lineNo, "tape",
-                                 "to specify an empty tape, just don't use the TAPE keyword")) {
+    private fun processTape() {
+        if (!checkArgumentSingle("tape", "to specify an empty tape, just don't use the TAPE keyword")) {
             return
         }
 
@@ -180,8 +181,8 @@ class TextReader(
         tape = line.substring(start, end)
     }
 
-    private fun processHead(splited: List<Token>, line: String, lineNo: Int) {
-        if (!checkArgumentSingle(splited, line, lineNo, "head position")) {
+    private fun processHead() {
+        if (!checkArgumentSingle("head position")) {
             return
         }
 
@@ -198,24 +199,24 @@ class TextReader(
         }
     }
 
-    private fun processState(splited: List<Token>, line: String, lineNo: Int) {
-        if (!checkArgumentSingle(splited, line, lineNo, "state")) {
+    private fun processState() {
+        if (!checkArgumentSingle("state")) {
             return
         }
 
         initialState = splited.second().token
     }
 
-    private fun processHalt(splited: List<Token>, line: String, lineNo: Int) {
-        if (!checkMissingArgs(splited, line, lineNo, "halt states")) {
+    private fun processHalt() {
+        if (!checkMissingArgs("halt states")) {
             return
         }
 
         endStates += splited.drop(1).map { it.token }
     }
 
-    private fun processWildcard(splited: List<Token>, line: String, lineNo: Int) {
-        if (!checkArgumentSingle(splited, line, lineNo, "wildcard")) {
+    private fun processWildcard() {
+        if (!checkArgumentSingle("wildcard")) {
             return
         }
 
@@ -232,8 +233,8 @@ class TextReader(
         wildcard = token.first()
     }
 
-    private fun processWhitespace(splited: List<Token>, line: String, lineNo: Int) {
-        if (!checkArgumentSingle(splited, line, lineNo, "whitespace")) {
+    private fun processWhitespace() {
+        if (!checkArgumentSingle("whitespace")) {
             return
         }
 
@@ -250,14 +251,7 @@ class TextReader(
         whitespace = token.first()
     }
 
-    private fun <T> parseField(
-        splited: List<Token>,
-        line: String,
-        lineNo: Int,
-        fieldName: String,
-        fieldParserInfo: FieldParserInfo<T>,
-        position: Int
-    ): T? {
+    private fun <T> parseField(fieldName: String, fieldParserInfo: FieldParserInfo<T>, position: Int): T? {
         if (splited.size <= position) {
             val index = splited.getOrNull(position - 1)?.end ?: 0
             val message = "missing $fieldName at poition $position"
@@ -278,14 +272,14 @@ class TextReader(
         return fieldParserInfo.getValue(representation)
     }
 
-    private fun processRule(splited: List<Token>, line: String, lineNo: Int, firstIndex: Int) {
+    private fun processRule(firstIndex: Int) {
         var index = firstIndex
 
-        val currentState = parseField(splited, line, lineNo, "CURRENT_STATE", STATE_PARSER_INFO, index++) ?: return
-        val currentSymbol = parseField(splited, line, lineNo, "CURRENT_SYMBOL", SYMBOL_PARSER_INFO, index++) ?: return
-        val newSymbol = parseField(splited, line, lineNo, "NEW_SYMBOL", SYMBOL_PARSER_INFO, index++) ?: return
-        val newState = parseField(splited, line, lineNo, "NEW_STATE", STATE_PARSER_INFO, index++) ?: return
-        val direction = parseField(splited, line, lineNo, "DIRECTION", DIRECTION_PARSER_INFO, index++) ?: return
+        val currentState = parseField("CURRENT_STATE", STATE_PARSER_INFO, index++) ?: return
+        val currentSymbol = parseField("CURRENT_SYMBOL", SYMBOL_PARSER_INFO, index++) ?: return
+        val newSymbol = parseField("NEW_SYMBOL", SYMBOL_PARSER_INFO, index++) ?: return
+        val newState = parseField("NEW_STATE", STATE_PARSER_INFO, index++) ?: return
+        val direction = parseField("DIRECTION", DIRECTION_PARSER_INFO, index++) ?: return
 
         if (splited.size > index) {
             val message = "too many entries, require: $index, actual ${splited.size}"
@@ -297,29 +291,33 @@ class TextReader(
         rules.add(rule)
     }
 
-    private fun parseLine(line: String, lineNo: Int) {
-        val splited = line.removeComment().tokenize()
+    private fun parseLine() {
+        splited = line.removeComment().tokenize()
 
         if (splited.isEmpty()) {
             return
         }
 
         when(splited[0].token) {
-            "TAPE" -> processTape(splited, line, lineNo)
-            "HEAD" -> processHead(splited, line, lineNo)
-            "STATE" -> processState(splited, line, lineNo)
-            "HALT" -> processHalt(splited, line, lineNo)
-            "WILDCARD" -> processWildcard(splited, line, lineNo)
-            "WHITESPACE" -> processWhitespace(splited, line, lineNo)
-            "RULE" -> processRule(splited, line, lineNo, 1)
-            else -> processRule(splited, line, lineNo, 0)
+            "TAPE" -> processTape()
+            "HEAD" -> processHead()
+            "STATE" -> processState()
+            "HALT" -> processHalt()
+            "WILDCARD" -> processWildcard()
+            "WHITESPACE" -> processWhitespace()
+            "RULE" -> processRule(1)
+            else -> processRule(0)
         }
     }
 
     fun read() {
         try {
             File(path).useLines { lines ->
-                lines.forEachIndexed { index, line -> parseLine(line, index + 1) }
+                lines.forEachIndexed { index, _line ->
+                    line = _line
+                    lineNo = index + 1
+                    parseLine()
+                }
             }
         } catch (e: java.io.FileNotFoundException) {
             _errors.add(FileNotFoundError("No such file or directory: \"$path\""))
