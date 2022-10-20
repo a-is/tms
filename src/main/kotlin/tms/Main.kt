@@ -22,13 +22,15 @@ import Wrapper
 import tms.console.Console
 import tms.machine.MachineBuilder
 import tms.machine.command.InfoCommand
+import tms.machine.command.LoadCommand
 
 fun main() {
     val dumbMachine = MachineBuilder().build()
     val machine = Wrapper(dumbMachine)
 
     val commands = listOf(
-        InfoCommand(machine)
+        InfoCommand(machine),
+        LoadCommand(machine),
     )
 
     val console = Console(commands)
