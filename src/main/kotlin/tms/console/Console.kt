@@ -31,7 +31,7 @@ private val LICENSE_NOTICE = """
     """.trimIndent()
 
 class Console(
-    commands: List<Command> = listOf()
+    commands: List<Command>
 ) {
     private val executor: Executor
 

@@ -18,11 +18,20 @@
 
 package tms
 
+import Wrapper
 import tms.console.Console
+import tms.machine.MachineBuilder
+import tms.machine.command.InfoCommand
 
 fun main() {
-    val console = Console()
+    val dumbMachine = MachineBuilder().build()
+    val machine = Wrapper(dumbMachine)
+
+    val commands = listOf(
+        InfoCommand(machine)
+    )
+
+    val console = Console(commands)
 
     console.run()
-
 }
