@@ -28,7 +28,7 @@ private fun StringBuilder.fillUntil(length: Int, fill: Char = ' ') {
     }
 }
 
-fun toString(tape: Tape): String {
+fun prettyPrint(tape: Tape) {
     /**
      * ```
      * line1:     0                   10    | < position numbers, multiples of LEGEND_STEP
@@ -84,17 +84,19 @@ fun toString(tape: Tape): String {
         line.substring(anchor - mid, anchor) + line.substring(anchor, anchor + SCREEN_WIDTH - mid) + '\n'
     }
 
-    return StringBuilder()
+    val result = StringBuilder()
         .append(resultLine(line1))
         .append(resultLine(line2))
         .append(resultLine(line3))
         .append(resultLine(line4))
         .append(resultLine(line5))
         .toString()
+
+    print(result)
 }
 
 fun prettyPrint(machine: Machine) {
-    print(toString(machine.tape))
+    prettyPrint(machine.tape)
 
     val step = "Step: ${machine.step}"
     val state = "State: ${machine.state}"
