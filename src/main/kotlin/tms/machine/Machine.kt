@@ -99,6 +99,11 @@ class Machine(
     private val whitespace: Char = whitespace
 
     /**
+     * Verbosity
+     */
+    var verbose: Boolean = true
+
+    /**
      * Has the machine reached one of the [endStates].
      */
     fun isHalted(): Boolean = state in endStates
@@ -146,7 +151,10 @@ class Machine(
      */
     fun step() {
         stepImpl()
-        prettyPrint(this)
+
+        if (verbose) {
+            prettyPrint(this)
+        }
     }
 
     /**
@@ -161,7 +169,9 @@ class Machine(
             stepImpl()
         } while (!isInterrupted() && !isHalted())
 
-        prettyPrint(this)
+        if (verbose) {
+            prettyPrint(this)
+        }
     }
 
     private fun characterCountPrint() {

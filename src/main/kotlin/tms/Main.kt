@@ -36,6 +36,7 @@ fun interactive() {
         LoadCommand(machine),
         RunCommand(machine),
         StepCommand(machine),
+        VerboseCommand(machine),
     )
 
     val console = Console(commands)
@@ -56,9 +57,13 @@ fun fromFile(path: String) {
     }
 
     val machine = reader.buildMachine()
+
     machine.breakStates.clear()
+    machine.verbose = false
+
     machine.run()
-    prettyPrint(machine)
+
+    machine.printDetailedInfo()
 }
 
 fun main(args: Array<String>) {
