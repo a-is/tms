@@ -53,10 +53,17 @@ class Console(
 
         println(LICENSE_NOTICE)
 
+        var previousCommand = ""
+
         while (true) {
             try {
                 val command = reader.readLine(PROMPT)
-                executor.execute(command)
+
+                if (command.trim().isNotEmpty()) {
+                    previousCommand = command
+                }
+
+                executor.execute(previousCommand)
             } catch (e: UserInterruptException) {
                 return
             } catch (e: EndOfFileException) {
