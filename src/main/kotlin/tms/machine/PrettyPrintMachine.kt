@@ -46,12 +46,6 @@ fun prettyPrint(tape: Tape) {
 
     var anchor = -1
 
-    /*
-     * Since a space is inserted between each character, only SCREEN_WIDTH / 2 characters will fit into the screen.
-     *
-     * To prevent long character numbers from disappearing,
-     * we calculate an additional LEGEND_STEP characters to the left of the screen border
-     */
     val leftmost = tape.position - SCREEN_WIDTH / 2 - LEGEND_STEP
     val rightmost = tape.position + SCREEN_WIDTH / 2 + 1
 
