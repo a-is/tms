@@ -33,7 +33,7 @@ class HelpCommand(
 
     init {
         val sortedCommands = (commands + this).map { it.name }.sorted()
-        val argument = CommandArgument("cmd", "command name", StringsCompleter(sortedCommands))
+        val argument = CommandArgument("cmd", "command name", StringsCompleter(sortedCommands), true)
         arguments = listOf(argument)
     }
 

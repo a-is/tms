@@ -33,7 +33,7 @@ class Executor(
      * logging to a file may be added.
      */
     fun execute(line: String) {
-        if (line.isBlank()) {
+        if (line.trim().isBlank()) {
             return
         }
 
@@ -43,7 +43,27 @@ class Executor(
 
         val command = commands[name] ?: throw UnsupportedCommandException(name)
 
+        val requiremArgsMinCount = command.arguments.count { !it.optional }
+        val requiremArgsMaxCount = command.arguments.count()
+        val actualArgsCount = splited.size - 1
+
+        val errorMessageInfo = {
+            val prefix = if (requiremArgsMinCount == requiremArgsMaxCount) {
+                "$requiremArgsMinCount"
+            } else {
+                "$requiremArgsMinCount to $requiremArgsMaxCount"
+            }
+            "$prefix arguments are expected, and $actualArgsCount are passed."
+        }
+
+        if (actualArgsCount < requiremArgsMinCount) {
+            throw IncorrectArgumentsCountException("Too few arguments. ${errorMessageInfo()}")
+        }
+
+        if (actualArgsCount > requiremArgsMaxCount) {
+            throw IncorrectArgumentsCountException("Too many arguments. ${errorMessageInfo()}")
+        }
+
         command.execute(splited)
     }
-
 }
