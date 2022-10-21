@@ -22,7 +22,6 @@ import Wrapper
 import tms.console.Console
 import tms.machine.MachineBuilder
 import tms.machine.command.*
-import tms.machine.prettyPrint
 import tms.reader.TextReader
 
 fun interactive() {
