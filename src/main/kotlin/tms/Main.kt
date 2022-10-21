@@ -23,6 +23,8 @@ import tms.console.Console
 import tms.machine.MachineBuilder
 import tms.machine.command.InfoCommand
 import tms.machine.command.LoadCommand
+import tms.machine.command.RunCommand
+import tms.machine.command.StepCommand
 import tms.machine.prettyPrint
 import tms.reader.TextReader
 
@@ -33,6 +35,8 @@ fun interactive() {
     val commands = listOf(
         InfoCommand(machine),
         LoadCommand(machine),
+        RunCommand(machine),
+        StepCommand(machine),
     )
 
     val console = Console(commands)

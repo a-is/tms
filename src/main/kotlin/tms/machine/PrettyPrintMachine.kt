@@ -95,13 +95,16 @@ fun prettyPrint(tape: Tape) {
     print(result)
 }
 
-fun prettyPrint(machine: Machine) {
-    prettyPrint(machine.tape)
-
+fun prettyPrintStepState(machine: Machine) {
     val step = "Step: ${machine.step}"
     val state = "State: ${machine.state}"
 
     print(step)
     print(" ".repeat(SCREEN_WIDTH - step.length - state.length))
     println(state)
+}
+
+fun prettyPrint(machine: Machine) {
+    prettyPrint(machine.tape)
+    prettyPrintStepState(machine)
 }
