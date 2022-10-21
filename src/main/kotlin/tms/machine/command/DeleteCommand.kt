@@ -24,27 +24,23 @@ import tms.console.Command
 import tms.console.CommandArgument
 import tms.machine.Machine
 
-class BreakCommand(
+class DeleteCommand(
     private val machine: Wrapper<Machine>
 ) : Command {
-    override val name: String = "break"
+    override val name: String = "delete"
 
-    override val description: String = "set breakpoint at specified state"
+    override val description: String = "delete some breakpoints."
 
     override val arguments: List<CommandArgument>
         get() {
-            val states = machine.value.allPossibleStates.toMutableSet()
-
-            for (state in machine.value.breakStates) {
-                states.remove(state)
-            }
+            val states = machine.value.breakStates
 
             return listOf(
-                CommandArgument("state", "state to add", StringsCompleter(states))
+                CommandArgument("state", "state to delete", StringsCompleter(states))
             )
         }
 
     override fun execute(args: List<String>) {
-        machine.value.breakStates.add(args[1])
+        machine.value.breakStates.remove(args[1])
     }
 }

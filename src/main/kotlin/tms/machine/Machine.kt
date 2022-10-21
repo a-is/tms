@@ -47,6 +47,22 @@ class Machine(
         private set
 
     /**
+     * All possible states.
+     */
+    val allPossibleStates: Set<String>
+
+    init {
+        val states = mutableSetOf<String>()
+
+        for (rule in rules) {
+            states.add(rule.trigger.state)
+            states.add(rule.action.state)
+        }
+
+        allPossibleStates = states
+    }
+
+    /**
      * Current step number.
      */
     var step: Int = 0
