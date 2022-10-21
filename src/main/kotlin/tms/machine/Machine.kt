@@ -19,6 +19,11 @@
 package tms.machine
 
 /**
+ * Return all printable characters (including space ' ')
+ */
+fun asciiPrintable() = 32.toChar() until 127.toChar()
+
+/**
  * The executor of the Turing machine.
  */
 class Machine(
@@ -159,6 +164,24 @@ class Machine(
         prettyPrint(this)
     }
 
+    private fun characterCountPrint() {
+        val counts = mutableMapOf<Char, Int>()
+
+        for (position in tape.leftmost..tape.rightmost) {
+            val symbol = tape.read(position)
+
+            if (symbol !in asciiPrintable() || symbol == whitespace) {
+                continue
+            }
+
+            val count = counts.getOrDefault(symbol, 0)
+
+            counts[symbol] = count + 1
+        }
+
+        println("Symbols count: $counts")
+    }
+
     fun printDetailedInfo() {
         prettyPrint(tape)
 
@@ -170,7 +193,7 @@ class Machine(
             // Ignore
         }
 
-        // TODO: characters count
+        characterCountPrint()
 
         println("Step: $step")
         println("State: $state")
