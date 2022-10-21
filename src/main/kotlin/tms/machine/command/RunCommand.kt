@@ -35,7 +35,6 @@ class RunCommand(
 
     override fun execute(args: List<String>) {
         machine.value.run()
-        prettyPrintStepState(machine.value)
 
         if (machine.value.isHalted()) {
             println("Halted")

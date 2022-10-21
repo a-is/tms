@@ -35,7 +35,6 @@ class StepCommand(
 
     override fun execute(args: List<String>) {
         machine.value.step()
-        prettyPrintStepState(machine.value)
 
         if (machine.value.isHalted()) {
             println("Halted")

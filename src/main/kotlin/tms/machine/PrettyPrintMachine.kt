@@ -102,3 +102,16 @@ fun prettyPrint(machine: Machine) {
     prettyPrint(machine.tape)
     prettyPrintStepState(machine)
 }
+
+fun prettyPrint(rule: Rule) {
+    val directionChars = mapOf(
+        Direction.LEFT to '<',
+        Direction.STAY to 'v',
+        Direction.RIGHT to '>',
+    )
+
+    val trigger = rule.trigger
+    val action = rule.action
+
+    println("${trigger.state}[${trigger.symbol}] ${directionChars[action.direction]} ${action.state}[${action.symbol}]")
+}

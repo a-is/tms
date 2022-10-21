@@ -22,7 +22,6 @@ import Wrapper
 import tms.console.Command
 import tms.console.CommandArgument
 import tms.machine.Machine
-import tms.machine.prettyPrint
 
 class InfoCommand(
     private val machine: Wrapper<Machine>
@@ -34,6 +33,6 @@ class InfoCommand(
     override val arguments: List<CommandArgument> = listOf()
 
     override fun execute(args: List<String>) {
-        prettyPrint(machine.value)
+        machine.value.printDetailedInfo()
     }
 }

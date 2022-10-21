@@ -120,12 +120,7 @@ class Machine(
         return rule.replaceWildcard(wildcard, symbol)
     }
 
-    /**
-     * Perform one step.
-     *
-     * Note that if the machine is already halted (see [isHalted]), nothing will happen.
-     */
-    fun step() {
+    private fun stepImpl() {
         if (isHalted()) {
             return
         }
@@ -140,6 +135,16 @@ class Machine(
     }
 
     /**
+     * Perform one step.
+     *
+     * Note that if the machine is already halted (see [isHalted]), nothing will happen.
+     */
+    fun step() {
+        stepImpl()
+        prettyPrint(this)
+    }
+
+    /**
      * Execute the steps either until one of the states contained in [breakStates] or [endStates] is reached.
      *
      * Note that the states from [breakStates] are not taken into account when performing the first step inside this
@@ -148,7 +153,33 @@ class Machine(
      */
     fun run() {
         do {
-            step()
+            stepImpl()
         } while (!isInterrupted() && !isHalted())
+
+        prettyPrint(this)
+    }
+
+    fun printDetailedInfo() {
+        prettyPrint(tape)
+
+        try {
+            val nextRule = nextRule()
+            print("Next rule: ")
+            prettyPrint(nextRule)
+        } catch (e: RuleNotFoundException) {
+            // Ignore
+        }
+
+        // TODO: characters count
+
+        println("Step: $step")
+        println("State: $state")
+        println("Symbol: \'${tape.read()}\'")
+        println("Break states: $breakStates")
+        println("End states: $endStates")
+        println("Wildcard: \'$wildcard\'")
+        println("Whitespace: \'$whitespace\'")
+        println("Interrupted: ${isInterrupted()}")
+        println("Halted: ${isHalted()}")
     }
 }
