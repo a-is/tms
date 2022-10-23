@@ -192,6 +192,10 @@ class TextReader(
             addSyntaxError(token.start, token.end, "wildcard should be a single character")
         }
 
+        if (token.value == whitespace.toString()) {
+            addSyntaxError(token.start, token.end, "wildcard cannot be equal to whitespace")
+        }
+
         wildcard = token.value
     }
 
@@ -204,6 +208,10 @@ class TextReader(
 
         if (token.value.length != 1) {
             addSyntaxError(token.start, token.end, "whitespace should be a single character")
+        }
+
+        if (token.value == wildcard) {
+            addSyntaxError(token.start, token.end, "whitespace cannot be equal to wildcard")
         }
 
         whitespace = token.value.first()
