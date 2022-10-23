@@ -190,6 +190,7 @@ class TextReader(
 
         if (token.value == whitespace.toString()) {
             addSyntaxError(token.start, token.end, "wildcard cannot be equal to whitespace")
+            return
         }
 
         wildcard = token.value
@@ -204,10 +205,12 @@ class TextReader(
 
         if (token.value.length != 1) {
             addSyntaxError(token.start, token.end, "whitespace should be a single character")
+            return
         }
 
         if (token.value == wildcard) {
             addSyntaxError(token.start, token.end, "whitespace cannot be equal to wildcard")
+            return
         }
 
         whitespace = token.value.first()
@@ -276,6 +279,7 @@ class TextReader(
         if (splited.size > index) {
             val message = "too many entries, require: $index, actual ${splited.size}"
             addSyntaxError(splited[index].start, splited.last().end, message)
+            return
         }
 
         val rule = Rule(currentState, currentSymbol, newState, newSymbol, direction)
