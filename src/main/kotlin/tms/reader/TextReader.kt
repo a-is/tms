@@ -188,10 +188,6 @@ class TextReader(
 
         val token = splited.second()
 
-        if (token.value.length != 1) {
-            addSyntaxError(token.start, token.end, "wildcard should be a single character")
-        }
-
         if (token.value == whitespace.toString()) {
             addSyntaxError(token.start, token.end, "wildcard cannot be equal to whitespace")
         }
