@@ -267,11 +267,11 @@ class TextReader(
     private fun processRule(firstIndex: Int) {
         var index = firstIndex
 
-        val currentState = parseField("CURRENT_STATE", STATE_PARSER_INFO, index++) ?: return
-        val currentSymbol = parseField("CURRENT_SYMBOL", SYMBOL_PARSER_INFO, index++) ?: return
-        val newSymbol = parseField("NEW_SYMBOL", SYMBOL_PARSER_INFO, index++) ?: return
-        val direction = parseField("DIRECTION", DIRECTION_PARSER_INFO, index++) ?: return
-        val newState = parseField("NEW_STATE", STATE_PARSER_INFO, index++) ?: return
+        val currentState = parseField("currentState", STATE_PARSER_INFO, index++) ?: return
+        val currentSymbol = parseField("currentSymbol", SYMBOL_PARSER_INFO, index++) ?: return
+        val newSymbol = parseField("newSymbol", SYMBOL_PARSER_INFO, index++) ?: return
+        val direction = parseField("direction", DIRECTION_PARSER_INFO, index++) ?: return
+        val newState = parseField("newState", STATE_PARSER_INFO, index++) ?: return
 
         if (splited.size > index) {
             val message = "too many entries, require: $index, actual ${splited.size}"
