@@ -19,7 +19,7 @@
 package tms.machine
 
 class RuleNotFoundException(
-    private val trigger: RuleTrigger
+    private val trigger: Rule.Trigger
 ) : Exception() {
 
     override val message: String

@@ -18,10 +18,27 @@
 
 package tms.machine
 
+enum class Direction(val offset: Int) {
+    LEFT(-1),
+    STAY(0),
+    RIGHT(1)
+}
+
 data class Rule(
-    val trigger: RuleTrigger,
-    val action: RuleAction,
+    val trigger: Trigger,
+    val action: Action,
 ) {
+    data class Trigger(
+        val state: State,
+        val symbol: Symbol,
+    )
+
+    data class Action(
+        val state: State,
+        val symbol: Symbol,
+        val direction: Direction,
+    )
+
     constructor(
         currentState: State,
         currentSymbol: Symbol,
@@ -29,8 +46,8 @@ data class Rule(
         newSymbol: Symbol,
         direction: Direction,
     ) : this(
-        RuleTrigger(currentState, currentSymbol),
-        RuleAction(newState, newSymbol, direction),
+        Trigger(currentState, currentSymbol),
+        Action(newState, newSymbol, direction),
     )
 
     fun replaceWildcard(symbol: RealSymbol): Rule {
