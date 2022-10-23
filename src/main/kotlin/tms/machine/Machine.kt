@@ -19,11 +19,6 @@
 package tms.machine
 
 /**
- * Return all printable characters (including space ' ')
- */
-fun asciiPrintable() = 32.toChar() until 127.toChar()
-
-/**
  * The executor of the Turing machine.
  */
 class Machine(
@@ -174,12 +169,12 @@ class Machine(
     }
 
     private fun characterCountPrint() {
-        val counts = mutableMapOf<Char, Int>()
+        val counts = mutableMapOf<RealSymbol, Int>()
 
         for (position in tape.leftmost..tape.rightmost) {
-            val symbol = tape.read(position).value
+            val symbol = tape.read(position)
 
-            if (symbol !in asciiPrintable()) {
+            if (!symbol.isPrintable() || symbol == whitespace) {
                 continue
             }
 

@@ -18,6 +18,12 @@
 
 package tms.machine
 
+/**
+ * Return all printable characters (including space ' ')
+ */
+fun asciiPrintable() = 32.toChar() until 127.toChar()
+
+
 abstract class Symbol
 
 object WildcardSymbol : Symbol()
@@ -27,4 +33,6 @@ data class RealSymbol(
 ) : Symbol() {
 
     override fun toString(): String = value.toString()
+
+    fun isPrintable(): Boolean = value in asciiPrintable()
 }
