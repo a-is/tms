@@ -43,7 +43,7 @@ class Machine(
      * The program for the machine. It is a mapping of [RuleTrigger] to [Rule].
      * To add a new rule, use the [add] function.
      */
-    private val rules: Map<RuleTrigger, Rule> = rules.associateBy { it.trigger }
+    private val rules: Map<Rule.Trigger, Rule> = rules.associateBy { it.trigger }
 
     /**
      * The current state of the machine. Use this field to set the initial state.
@@ -114,12 +114,12 @@ class Machine(
 
     private fun nextRule(): Rule {
         val symbol = tape.read()
-        val trigger = RuleTrigger(state, symbol)
+        val trigger = Rule.Trigger(state, symbol)
 
         var rule = rules[trigger]
 
         if (rule == null) {
-            rule = rules[RuleTrigger(state, WildcardSymbol)]
+            rule = rules[Rule.Trigger(state, WildcardSymbol)]
         }
 
         if (rule == null) {
