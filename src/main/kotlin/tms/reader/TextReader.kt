@@ -38,35 +38,6 @@ private fun <T> List<T>.third(): T {
     return this[2]
 }
 
-private val DIRECTION_MAP = mapOf(
-    "l" to Direction.LEFT,
-    "r" to Direction.RIGHT
-)
-
-private data class FieldParserInfo<T>(
-    val validate: (String) -> Boolean,
-    val getValue: (String) -> T,
-    val errorMessage: (fieldName: String) -> String,
-)
-
-private val STATE_PARSER_INFO = FieldParserInfo(
-    { true },
-    { it },
-    { error("This function should never be called") }
-)
-
-private val SYMBOL_PARSER_INFO = FieldParserInfo(
-    { it.length == 1 },
-    { it[0] },
-    { name -> "$name should be a single character" }
-)
-
-private val DIRECTION_PARSER_INFO = FieldParserInfo(
-    { it.lowercase() in DIRECTION_MAP.keys },
-    { DIRECTION_MAP[it.lowercase()]!! },
-    { name -> "$name should be in ${DIRECTION_MAP.keys}" }
-)
-
 class TextReader(
     private val path: String
 ) {
@@ -259,21 +230,35 @@ class TextReader(
         return fieldParserInfo.getValue(representation)
     }
 
-    private fun toState(state: String): State {
-        return if (state == wildcard) {
-            WildcardState
-        } else {
-            RealState(state)
-        }
-    }
+    private data class FieldParserInfo<T>(
+        val validate: (String) -> Boolean,
+        val getValue: (String) -> T,
+        val errorMessage: (fieldName: String) -> String,
+    )
 
-    private fun toSymbol(state: Char): Symbol {
-        return if (state.toString() == wildcard) {
-            WildcardSymbol
-        } else {
-            RealSymbol(state)
-        }
-    }
+    private val STATE_PARSER_INFO = FieldParserInfo(
+        { true },
+        { if (it == wildcard) WildcardState else RealState(it) },
+        { error("This function should never be called") }
+    )
+
+    private val SYMBOL_PARSER_INFO = FieldParserInfo(
+        { it.length == 1 },
+        { if (it == wildcard) WildcardSymbol else RealSymbol(it.first()) },
+        { name -> "$name should be a single character" }
+    )
+
+    private val DIRECTION_PARSER_INFO = FieldParserInfo(
+        { it.lowercase() in listOf("l", "r", wildcard) },
+        {
+            when(it.lowercase()) {
+                "l" -> Direction.LEFT
+                "r" -> Direction.RIGHT
+                else -> Direction.STAY
+            }
+        },
+        { name -> "$name should be l/L, r/R or WILDCARD (current value is $wildcard)" }
+    )
 
     private fun processRule(firstIndex: Int) {
         var index = firstIndex
@@ -289,7 +274,7 @@ class TextReader(
             addSyntaxError(splited[index].start, splited.last().end, message)
         }
 
-        val rule = Rule(toState(state), toSymbol(symbol), toState(newState), toSymbol(newSymbol), direction)
+        val rule = Rule(state, symbol, newState, newSymbol, direction)
 
         rules.add(rule)
     }
