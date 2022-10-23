@@ -27,17 +27,18 @@ fun asciiPrintable() = 32.toChar() until 127.toChar()
  * The executor of the Turing machine.
  */
 class Machine(
-    tape: Tape,
     rules: List<Rule>,
     initialState: String,
     endStates: Set<String>,
     wildcard: Char,
     whitespace: Char,
+    headPosition: Int,
+    initialTapeValue: String = "",
 ) {
     /**
      * Tape. Also contains the position of the head.
      */
-    val tape: Tape = tape
+    val tape: Tape = Tape(whitespace, headPosition, initialTapeValue)
 
     /**
      * The program for the machine. It is a mapping of [RuleTrigger] to [Rule].

@@ -98,15 +98,14 @@ class MachineBuilder {
     }
 
     fun build(): Machine {
-        val tape = Tape(whitespace, initialHeadPosition, tape)
-
         return Machine(
-            tape = tape,
             rules = rules,
             initialState = initialState,
             endStates = endStates,
             wildcard = wildcard,
             whitespace = whitespace,
+            headPosition = initialHeadPosition,
+            initialTapeValue = tape,
         )
     }
 }
