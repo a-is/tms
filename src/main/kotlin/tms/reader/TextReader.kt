@@ -263,8 +263,8 @@ class TextReader(
     private fun processRule(firstIndex: Int) {
         var index = firstIndex
 
-        val state = parseField("CURRENT_STATE", STATE_PARSER_INFO, index++) ?: return
-        val symbol = parseField("CURRENT_SYMBOL", SYMBOL_PARSER_INFO, index++) ?: return
+        val currentState = parseField("CURRENT_STATE", STATE_PARSER_INFO, index++) ?: return
+        val currentSymbol = parseField("CURRENT_SYMBOL", SYMBOL_PARSER_INFO, index++) ?: return
         val newSymbol = parseField("NEW_SYMBOL", SYMBOL_PARSER_INFO, index++) ?: return
         val direction = parseField("DIRECTION", DIRECTION_PARSER_INFO, index++) ?: return
         val newState = parseField("NEW_STATE", STATE_PARSER_INFO, index++) ?: return
@@ -274,7 +274,7 @@ class TextReader(
             addSyntaxError(splited[index].start, splited.last().end, message)
         }
 
-        val rule = Rule(state, symbol, newState, newSymbol, direction)
+        val rule = Rule(currentState, currentSymbol, newState, newSymbol, direction)
 
         rules.add(rule)
     }
