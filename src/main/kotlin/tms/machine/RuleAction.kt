@@ -25,7 +25,7 @@ enum class Direction(val offset: Int) {
 }
 
 data class RuleAction(
-    val state: String,
-    val symbol: Char,
+    val state: State,
+    val symbol: Symbol,
     val direction: Direction,
 )

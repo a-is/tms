@@ -28,10 +28,9 @@ fun asciiPrintable() = 32.toChar() until 127.toChar()
  */
 class Machine(
     rules: List<Rule>,
-    initialState: String,
-    endStates: Set<String>,
-    wildcard: Char,
-    whitespace: Char,
+    initialState: RealState,
+    endStates: Set<RealState>,
+    whitespace: RealSymbol,
     headPosition: Int,
     initialTapeValue: String = "",
 ) {
@@ -49,20 +48,26 @@ class Machine(
     /**
      * The current state of the machine. Use this field to set the initial state.
      */
-    var state: String = initialState
+    var state: RealState = initialState
         private set
 
     /**
      * All possible states.
      */
-    val allPossibleStates: Set<String>
+    val allPossibleStates: Set<RealState>
 
     init {
-        val states = mutableSetOf<String>()
+        val states = mutableSetOf<RealState>()
+
+        val add = fun(state: State) {
+            if (state is RealState) {
+                states.add(state)
+            }
+        }
 
         for (rule in rules) {
-            states.add(rule.trigger.state)
-            states.add(rule.action.state)
+            add(rule.trigger.state)
+            add(rule.action.state)
         }
 
         allPossibleStates = states
@@ -80,24 +85,17 @@ class Machine(
      * Note that it only affects the [run] function. The [step] function will execute the step even if the current state
      * is contained in [breakStates].
      */
-    val breakStates: MutableSet<String> = mutableSetOf()
+    val breakStates: MutableSet<RealState> = mutableSetOf()
 
     /**
      * A set of states, after reaching which the execution of the program will be halted.
      */
-    private val endStates: Set<String> = endStates
-
-    /**
-     * The wildcard character is used for the simplicity of setting rules. If a wildcard character is specified instead
-     * of the current character, then any character fits this rule. For the new state and new symbol, the wildcard
-     * symbol means "the state/symbol does not change".
-     */
-    private val wildcard: Char = wildcard
+    private val endStates: Set<RealState> = endStates
 
     /**
      * Whitespace symbol.
      */
-    private val whitespace: Char = whitespace
+    private val whitespace: RealSymbol = whitespace
 
     /**
      * Verbosity
@@ -121,14 +119,14 @@ class Machine(
         var rule = rules[trigger]
 
         if (rule == null) {
-            rule = rules[RuleTrigger(state, wildcard)]
+            rule = rules[RuleTrigger(state, WildcardSymbol)]
         }
 
         if (rule == null) {
             throw RuleNotFoundException(trigger)
         }
 
-        return rule.replaceWildcard(wildcard, symbol)
+        return rule.replaceWildcard(symbol)
     }
 
     private fun stepImpl() {
@@ -138,9 +136,9 @@ class Machine(
 
         val rule = nextRule()
 
-        tape.write(rule.action.symbol)
+        tape.write(rule.action.symbol as RealSymbol)
         tape.move(rule.action.direction)
-        state = rule.action.state
+        state = rule.action.state as RealState
 
         step++
     }
@@ -179,9 +177,9 @@ class Machine(
         val counts = mutableMapOf<Char, Int>()
 
         for (position in tape.leftmost..tape.rightmost) {
-            val symbol = tape.read(position)
+            val symbol = tape.read(position).value
 
-            if (symbol !in asciiPrintable() || symbol == whitespace) {
+            if (symbol !in asciiPrintable()) {
                 continue
             }
 
@@ -211,7 +209,6 @@ class Machine(
         println("Symbol: \'${tape.read()}\'")
         println("Break states: $breakStates")
         println("End states: $endStates")
-        println("Wildcard: \'$wildcard\'")
         println("Whitespace: \'$whitespace\'")
         println("Interrupted: ${isInterrupted()}")
         println("Halted: ${isHalted()}")

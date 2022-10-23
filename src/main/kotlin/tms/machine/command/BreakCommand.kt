@@ -23,6 +23,7 @@ import org.jline.reader.impl.completer.StringsCompleter
 import tms.console.Command
 import tms.console.CommandArgument
 import tms.machine.Machine
+import tms.machine.RealState
 
 class BreakCommand(
     private val machine: Wrapper<Machine>
@@ -40,11 +41,11 @@ class BreakCommand(
             }
 
             return listOf(
-                CommandArgument("state", "state to add", StringsCompleter(states))
+                CommandArgument("state", "state to add", StringsCompleter(states.map { it.value }))
             )
         }
 
     override fun execute(args: List<String>) {
-        machine.value.breakStates.add(args[1])
+        machine.value.breakStates.add(RealState(args[1]))
     }
 }

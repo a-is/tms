@@ -23,6 +23,7 @@ import org.jline.reader.impl.completer.StringsCompleter
 import tms.console.Command
 import tms.console.CommandArgument
 import tms.machine.Machine
+import tms.machine.RealState
 
 class DeleteCommand(
     private val machine: Wrapper<Machine>
@@ -36,11 +37,11 @@ class DeleteCommand(
             val states = machine.value.breakStates
 
             return listOf(
-                CommandArgument("state", "state to delete", StringsCompleter(states))
+                CommandArgument("state", "state to delete", StringsCompleter(states.map { it.value }))
             )
         }
 
     override fun execute(args: List<String>) {
-        machine.value.breakStates.remove(args[1])
+        machine.value.breakStates.remove(RealState(args[1]))
     }
 }

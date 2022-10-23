@@ -30,13 +30,13 @@ private fun left2cell(index: Int) = -(index + 1)
 private fun cell2right(index: Int) = index
 private fun right2cell(index: Int) = index
 
-private fun removeTrailingWhitespace(list: MutableList<Char>, whitespace: Char) {
+private fun <T> removeTrailingWhitespace(list: MutableList<T>, whitespace: T) {
     while (list.lastOrNull() == whitespace) {
         list.removeLast()
     }
 }
 
-private fun expandAndFillWithWhitespace(list: MutableList<Char>, newSize: Int, whitespace: Char) {
+private fun <T> expandAndFillWithWhitespace(list: MutableList<T>, newSize: Int, whitespace: T) {
     while (list.size < newSize) {
         list.add(whitespace)
     }
@@ -48,7 +48,7 @@ private fun expandAndFillWithWhitespace(list: MutableList<Char>, newSize: Int, w
  * Implemented based on two lists.
  */
 class Tape(
-    whitespace: Char,
+    whitespace: RealSymbol,
     headPosition: Int,
     initialState: String = "",
 ) {
@@ -56,13 +56,13 @@ class Tape(
      * A list for cells with a negative index (-1, -2, ...). The cell with the index `c` is stored in `_left[-(c + 1)]`,
      * see [cell2left] and [left2cell].
      */
-    private val _left: MutableList<Char> = mutableListOf()
+    private val _left: MutableList<RealSymbol> = mutableListOf()
 
     /**
      * A list for cells with a non-negative index (0, 1, ...). The cell with the index `c` is stored in `_right[c]`,
      * see [cell2right] and [right2cell].
      */
-    private val _right: MutableList<Char> = initialState.toMutableList()
+    private val _right: MutableList<RealSymbol> = initialState.map { RealSymbol(it) }.toMutableList()
 
     /**
      * Head position.
@@ -73,7 +73,7 @@ class Tape(
     /**
      * Whitespace symbol.
      */
-    private val whitespace: Char = whitespace
+    private val whitespace: RealSymbol = whitespace
 
     /**
      * The left border of the content part of the tape.
@@ -93,7 +93,7 @@ class Tape(
      * Bypassing the content part of the tape.
      * The "content part" of the tape is the smallest subset of the tape containing all non-whitespace characters.
      */
-    fun forEachIndexed(action: (index: Int, symbol: Char) -> Unit) {
+    fun forEachIndexed(action: (index: Int, symbol: RealSymbol) -> Unit) {
         for (i in _left.size - 1 downTo 0) {
             action(left2cell(i), _left[i])
         }
@@ -111,7 +111,7 @@ class Tape(
     /**
      * Reads the symbol from the specified [position] of the tape.
      */
-    fun read(position: Int): Char {
+    fun read(position: Int): RealSymbol {
         return if (position >= 0) {
             _right.getOrElse(cell2right(position)) { whitespace }
         } else {
@@ -122,13 +122,13 @@ class Tape(
     /**
      * Writes the [symbol] to the current [position] of the tape.
      */
-    fun write(symbol: Char) = write(position, symbol)
+    fun write(symbol: RealSymbol) = write(position, symbol)
 
     /**
      * Writes the symbol to the specified [position] of the tape.
      */
-    fun write(position: Int, symbol: Char) {
-        val writeImpl = fun(list: MutableList<Char>, index: Int, symbol: Char) {
+    fun write(position: Int, symbol: RealSymbol) {
+        val writeImpl = fun(list: MutableList<RealSymbol>, index: Int, symbol: RealSymbol) {
             expandAndFillWithWhitespace(list, index + 1, whitespace)
             list[index] = symbol
             removeTrailingWhitespace(list, whitespace)

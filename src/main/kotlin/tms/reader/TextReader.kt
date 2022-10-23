@@ -18,15 +18,13 @@
 
 package tms.reader
 
-import tms.machine.Direction
-import tms.machine.Machine
-import tms.machine.MachineBuilder
-import tms.machine.Rule
+import tms.machine.*
 import tms.util.Token
 import tms.util.tokenize
 import java.io.File
 
 private val COMMENT: Char = ';'
+private val DEFAULT_WILDCARD: String = "*"
 
 private fun String.removeComment(delimiter: Char): String {
     return this.split(delimiter, limit = 2)[0]
@@ -42,7 +40,6 @@ private fun <T> List<T>.third(): T {
 
 private val DIRECTION_MAP = mapOf(
     "l" to Direction.LEFT,
-    "*" to Direction.STAY,
     "r" to Direction.RIGHT
 )
 
@@ -103,7 +100,7 @@ class TextReader(
     /**
      * The wildcard character is used for the simplicity of setting rules.
      */
-    private var wildcard: Char? = null
+    private var wildcard: String = DEFAULT_WILDCARD
 
     /**
      * Whitespace symbol.
@@ -224,7 +221,7 @@ class TextReader(
             addSyntaxError(token.start, token.end, "wildcard should be a single character")
         }
 
-        wildcard = token.value.first()
+        wildcard = token.value
     }
 
     private fun processWhitespace() {
@@ -262,11 +259,27 @@ class TextReader(
         return fieldParserInfo.getValue(representation)
     }
 
+    private fun toState(state: String): State {
+        return if (state == wildcard) {
+            WildcardState
+        } else {
+            RealState(state)
+        }
+    }
+
+    private fun toSymbol(state: Char): Symbol {
+        return if (state.toString() == wildcard) {
+            WildcardSymbol
+        } else {
+            RealSymbol(state)
+        }
+    }
+
     private fun processRule(firstIndex: Int) {
         var index = firstIndex
 
-        val currentState = parseField("CURRENT_STATE", STATE_PARSER_INFO, index++) ?: return
-        val currentSymbol = parseField("CURRENT_SYMBOL", SYMBOL_PARSER_INFO, index++) ?: return
+        val state = parseField("CURRENT_STATE", STATE_PARSER_INFO, index++) ?: return
+        val symbol = parseField("CURRENT_SYMBOL", SYMBOL_PARSER_INFO, index++) ?: return
         val newSymbol = parseField("NEW_SYMBOL", SYMBOL_PARSER_INFO, index++) ?: return
         val direction = parseField("DIRECTION", DIRECTION_PARSER_INFO, index++) ?: return
         val newState = parseField("NEW_STATE", STATE_PARSER_INFO, index++) ?: return
@@ -276,7 +289,7 @@ class TextReader(
             addSyntaxError(splited[index].start, splited.last().end, message)
         }
 
-        val rule = Rule(currentState, currentSymbol, newState, newSymbol, direction)
+        val rule = Rule(toState(state), toSymbol(symbol), toState(newState), toSymbol(newSymbol), direction)
 
         rules.add(rule)
     }
@@ -332,19 +345,15 @@ class TextReader(
         }
 
         if (initialState != null) {
-            builder.initialState(initialState!!)
+            builder.initialState(RealState(initialState!!))
         }
 
         if (endStates.isNotEmpty()) {
-            builder.endStates(endStates)
-        }
-
-        if (wildcard != null) {
-            builder.wildcard(wildcard!!)
+            builder.endStates(endStates.map { RealState(it) }.toSet())
         }
 
         if (whitespace != null) {
-            builder.whitespace(whitespace!!)
+            builder.whitespace(RealSymbol(whitespace!!))
         }
 
         return builder.build()

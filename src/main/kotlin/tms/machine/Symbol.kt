@@ -18,7 +18,13 @@
 
 package tms.machine
 
-data class RuleTrigger(
-    val state: State,
-    val symbol: Symbol,
-)
+abstract class Symbol
+
+object WildcardSymbol : Symbol()
+
+data class RealSymbol(
+    val value: Char
+) : Symbol() {
+
+    override fun toString(): String = value.toString()
+}

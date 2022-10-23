@@ -18,11 +18,10 @@
 
 package tms.machine
 
-private val DEFAULT_WILDCARD: Char = '*'
-private val DEFAULT_STATE: String = "0"
-private val DEFAULT_WHITESPACE: Char = '_'
+private val DEFAULT_STATE: RealState = RealState("0")
+private val DEFAULT_WHITESPACE: RealSymbol = RealSymbol('_')
 private val DEFAULT_HEAD_POSITION: Int = 0
-private val DEFAULT_END_STATES: Set<String> = setOf("halt", "H")
+private val DEFAULT_END_STATES: Set<RealState> = listOf("halt", "H").map { RealState(it) }.toSet()
 
 class MachineBuilder {
     /**
@@ -45,22 +44,17 @@ class MachineBuilder {
     /**
      * Initial current state of the machine.
      */
-    private var initialState: String = DEFAULT_STATE
+    private var initialState: RealState = DEFAULT_STATE
 
     /**
      * A set of states, after reaching which the execution of the program will be halted.
      */
-    private var endStates: Set<String> = DEFAULT_END_STATES
-
-    /**
-     * The wildcard character is used for the simplicity of setting rules.
-     */
-    private var wildcard: Char = DEFAULT_WILDCARD
+    private var endStates: Set<RealState> = DEFAULT_END_STATES
 
     /**
      * Whitespace symbol.
      */
-    private var whitespace: Char = DEFAULT_WHITESPACE
+    private var whitespace: RealSymbol = DEFAULT_WHITESPACE
 
     fun tape(tape: String): MachineBuilder {
         this.tape = tape
@@ -77,22 +71,17 @@ class MachineBuilder {
         return this
     }
 
-    fun initialState(initialState: String): MachineBuilder {
+    fun initialState(initialState: RealState): MachineBuilder {
         this.initialState = initialState
         return this
     }
 
-    fun endStates(endStates: Set<String>): MachineBuilder {
+    fun endStates(endStates: Set<RealState>): MachineBuilder {
         this.endStates = endStates
         return this
     }
 
-    fun wildcard(wildcard: Char): MachineBuilder {
-        this.wildcard = wildcard
-        return this
-    }
-
-    fun whitespace(whitespace: Char): MachineBuilder {
+    fun whitespace(whitespace: RealSymbol): MachineBuilder {
         this.whitespace = whitespace
         return this
     }
@@ -102,7 +91,6 @@ class MachineBuilder {
             rules = rules,
             initialState = initialState,
             endStates = endStates,
-            wildcard = wildcard,
             whitespace = whitespace,
             headPosition = initialHeadPosition,
             initialTapeValue = tape,

@@ -23,29 +23,29 @@ data class Rule(
     val action: RuleAction,
 ) {
     constructor(
-        currentState: String,
-        currentSymbol: Char,
-        newState: String,
-        newSymbol: Char,
+        currentState: State,
+        currentSymbol: Symbol,
+        newState: State,
+        newSymbol: Symbol,
         direction: Direction,
     ) : this(
         RuleTrigger(currentState, currentSymbol),
         RuleAction(newState, newSymbol, direction),
     )
 
-    fun replaceWildcard(wildcard: Char, symbol: Char): Rule {
+    fun replaceWildcard(symbol: RealSymbol): Rule {
         var (currentState, currentSymbol) = trigger
         var (newState, newSymbol, direction) = action
 
-        if (currentSymbol == wildcard) {
+        if (currentSymbol is WildcardSymbol) {
             currentSymbol = symbol
         }
 
-        if (newState == wildcard.toString()) {
+        if (newState is WildcardState) {
             newState = currentState
         }
 
-        if (newSymbol == wildcard) {
+        if (newSymbol is WildcardSymbol) {
             newSymbol = currentSymbol
         }
 
