@@ -216,27 +216,6 @@ class TextReader(
         whitespace = token.value.first()
     }
 
-    private fun <T> parseField(fieldName: String, fieldParserInfo: FieldParserInfo<T>, position: Int): T? {
-        if (splited.size <= position) {
-            val index = splited.getOrNull(position - 1)?.end ?: 0
-            val message = "missing $fieldName at poition $position"
-
-            addSyntaxError(index, message)
-
-            return null
-        }
-
-        val representation = splited[position].value
-
-        if (!fieldParserInfo.validate(representation)) {
-            val message = fieldParserInfo.errorMessage(fieldName)
-            addSyntaxError(splited[position].start, splited[position].end, message)
-            return null
-        }
-
-        return fieldParserInfo.getValue(representation)
-    }
-
     private data class FieldParserInfo<T>(
         val validate: (String) -> Boolean,
         val getValue: (String) -> T,
@@ -266,6 +245,27 @@ class TextReader(
         },
         { name -> "$name should be l/L, r/R or WILDCARD (current value is $wildcard)" }
     )
+
+    private fun <T> parseField(fieldName: String, fieldParserInfo: FieldParserInfo<T>, position: Int): T? {
+        if (splited.size <= position) {
+            val index = splited.getOrNull(position - 1)?.end ?: 0
+            val message = "missing $fieldName at poition $position"
+
+            addSyntaxError(index, message)
+
+            return null
+        }
+
+        val representation = splited[position].value
+
+        if (!fieldParserInfo.validate(representation)) {
+            val message = fieldParserInfo.errorMessage(fieldName)
+            addSyntaxError(splited[position].start, splited[position].end, message)
+            return null
+        }
+
+        return fieldParserInfo.getValue(representation)
+    }
 
     private fun processRule(firstIndex: Int) {
         var index = firstIndex
